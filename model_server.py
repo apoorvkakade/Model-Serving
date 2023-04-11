@@ -16,6 +16,7 @@ def classify_process():
 	# load the pre-trained Keras model (here we are using a model
 	# pre-trained on ImageNet and provided by Keras, but you can
 	# substitute in your own networks just as easily)
+	
 	print("* Loading model...")
 	model = ResNet50(weights="imagenet")
 	print("* Model loaded")
@@ -25,6 +26,7 @@ def classify_process():
 		# initialize the image IDs and batch of images themselves
 		queue = db.lrange(settings.IMAGE_QUEUE, 0,
 			settings.BATCH_SIZE - 1)
+	
 		imageIDs = []
 		batch = None
 		# loop over the queue

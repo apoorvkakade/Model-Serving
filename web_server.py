@@ -42,6 +42,8 @@ def predict():
 			# classification
 			image = flask.request.files["image"].read()
 			image = Image.open(io.BytesIO(image))
+			# prepare image should be on model server after gpu is involved since even preprocessing can be done on batches rather
+			# than a single image.
 			image = prepare_image(image,
 				(settings.IMAGE_WIDTH, settings.IMAGE_HEIGHT))
 			# ensure our NumPy array is C-contiguous as well,
@@ -80,4 +82,4 @@ def predict():
 # server (don't use this for production
 if __name__ == "__main__":
 	print("* Starting web service...")
-	app.run()
+	app.run(host="0.0.0.0", port=7000)
