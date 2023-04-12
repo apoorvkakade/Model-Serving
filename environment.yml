@@ -1,4 +1,4 @@
-name: base
+name: fastapi-env
 channels:
   - defaults
 dependencies:

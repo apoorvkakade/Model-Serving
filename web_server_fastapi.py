@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from typing import Annotated
+from typing_extensions import Annotated
 from PIL import Image
 from fastapi import FastAPI, File, UploadFile
 import io
