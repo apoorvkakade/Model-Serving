@@ -1,0 +1,6 @@
+version: "3"
+services:    
+  webserver:
+    image: apoorv/bentoml
+    ports:
+      - 8000:7000
