@@ -1,6 +1,7 @@
 # import the necessary packages
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.resnet50 import preprocess_input
+from tensorflow.keras.applications.resnet50 import decode_predictions
 from PIL import Image
 import numpy as np
 import settings
@@ -11,11 +12,18 @@ import uuid
 import time
 import json
 import io
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications.resnet50 import decode_predictions
 
 # initialize our Flask application and Redis server
 app = flask.Flask(__name__)
 db = redis.StrictRedis(host=settings.REDIS_HOST,
 	port=settings.REDIS_PORT, db=settings.REDIS_DB)
+
+print("* Loading model...")
+model = ResNet50(weights="imagenet")
+print("* Model loaded")
+
 def prepare_image(image, target):
 	# if the image mode is not RGB, convert it
 	if image.mode != "RGB":
@@ -27,6 +35,8 @@ def prepare_image(image, target):
 	image = preprocess_input(image)
 	# return the processed image
 	return image
+
+
 @app.route("/")
 def homepage():
 	return "Welcome to the DISML project"
@@ -46,40 +56,13 @@ def predict():
 			# than a single image.
 			image = prepare_image(image,
 				(settings.IMAGE_WIDTH, settings.IMAGE_HEIGHT))
-			# ensure our NumPy array is C-contiguous as well,
-			# otherwise we won't be able to serialize it
-			image = image.copy(order="C")
-			# generate an ID for the classification then add the
-			# classification ID + image to the queue
-			k = str(uuid.uuid4())
-			image = helper_utilities.base64_encode_image(image)
-			d = {"id": k, "image": image}
-			db.rpush(settings.IMAGE_QUEUE, json.dumps(d))
-			# keep looping until our model server returns the output
-			# predictions
-			while True:
-				# attempt to grab the output predictions
-				output = db.get(k)
-				# check to see if our model has classified the input
-				# image
-				if output is not None:
-					# add the output predictions to our data
-					# dictionary so we can return it to the client
-					output = output.decode("utf-8")
-					data["predictions"] = json.loads(output)
-					# delete the result from the database and break
-					# from the polling loop
-					db.delete(k)
-					break
-				# sleep for a small amount to give the model a chance
-				# to classify the input image
-				time.sleep(settings.CLIENT_SLEEP)
-			# indicate that the request was a success
+			preds = model.predict(image)
+			results = decode_predictions(preds)
+			data["predictions"] = results
 			data["success"] = True
-	# return the data dictionary as a JSON response
 	return flask.jsonify(data)
 # for debugging purposes, it's helpful to start the Flask testing
 # server (don't use this for production
 if __name__ == "__main__":
 	print("* Starting web service...")
-	app.run(host="0.0.0.0", port=7000)
+	app.run(host="0.0.0.0", port=8000)
