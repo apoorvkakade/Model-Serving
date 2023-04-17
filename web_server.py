@@ -58,7 +58,19 @@ def predict():
 				(settings.IMAGE_WIDTH, settings.IMAGE_HEIGHT))
 			preds = model.predict(image)
 			results = decode_predictions(preds)
-			data["predictions"] = results
+
+			# initialize the list of output predictions
+			output = []
+
+			for resultSet in results:
+				# loop over the results and add them to the list of
+				# output predictions
+				print(resultSet)
+				for (imagenetID, label, prob) in resultSet:
+					r = {"label": label, "probability": float(prob)}
+					output.append(r)
+
+			data["predictions"] = output
 			data["success"] = True
 	return flask.jsonify(data)
 # for debugging purposes, it's helpful to start the Flask testing
