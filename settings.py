@@ -1,4 +1,4 @@
-REDIS_HOST  = "localhost"
+REDIS_HOST  = "redis"
 REDIS_PORT = 6379
 REDIS_DB = 0
 
@@ -9,7 +9,7 @@ IMAGE_DTYPE = "float32"
 
 IMAGE_QUEUE = "image_queue"
 BATCH_SIZE = 32
-CLIENT_SLEEP = 0.25 #SECONDS
+CLIENT_SLEEP = 0.05 #SECONDS
 SERVER_SLEEP = 0.5
 
 RESULT_HASH = "result_hash"

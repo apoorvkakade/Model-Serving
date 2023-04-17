@@ -82,4 +82,4 @@ def predict():
 # server (don't use this for production
 if __name__ == "__main__":
 	print("* Starting web service...")
-	app.run(host="0.0.0.0", port=7000)
+	app.run(host="0.0.0.0", port=8000)
